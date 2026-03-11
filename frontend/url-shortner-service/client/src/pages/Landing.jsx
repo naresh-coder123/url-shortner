@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../assets/Axios";
 
-const Landing = ({ loginStat }) => {
-  const [isLoggedIn] = loginStat;
+const Landing = ({ isLoggedIn }) => {
+  
   const [longUrl, setLongUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

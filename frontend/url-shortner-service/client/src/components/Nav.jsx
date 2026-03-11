@@ -1,47 +1,45 @@
-import React, { useState } from "react";
+import React from "react";
 import Logo from "../assets/logoNew.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Nav = ({ loginStat }) => {
-  const navItemsClass = `font-bold text-2xl text-white p-2 border-4 border-yellow-100 rounded-2xl hover:border-4 hover:border-yellow-200 transition-all duration-100 hover:bg-yellow-200 hover:text-black cursor-pointer`;
+const Nav = ({ isLoggedIn, setIsLoggedIn }) => {
+  const navigate = useNavigate();
 
-  const [isLoggedIn, setIsLogin] = loginStat;
+  const navItemsClass = `font-bold text-2xl text-white p-2 border-4 border-yellow-100 rounded-2xl hover:border-yellow-200 transition-all duration-100 hover:bg-yellow-200 hover:text-black cursor-pointer`;
 
-  const handleLogin = () => {
-    console.log("Handle Login");
-  };
-  const handleSignUp = () => {
-    console.log("Handle SignUp");
+  const handleLogout = () => {
+    // 1. Clear authentication (example: localStorage.removeItem("token"))
+    setIsLoggedIn(false);
+    navigate("/"); // Redirect to home after logout
   };
 
   return (
-    <nav className="flex fixed items-center justify-between shadow-md shadow-yellow-950 h-20 w-full bg-yellow-700 font-sans">
-      <div className="left flex w-auto ml-48 gap-8">
+    // Added z-50 to keep nav on top and removed redundant outer margins
+    <nav className="flex fixed top-0 left-0 z-50 items-center justify-between shadow-md shadow-yellow-950 h-20 w-full bg-yellow-700 font-sans px-10">
+      
+      {/* Left Section: Logo */}
+      <div className="flex items-center">
         <Link to="/">
-          <div className="h-20 w-60 cursor-pointer ">
-            <img src={Logo} alt="logo" />
+          <div className="h-16 w-52 overflow-hidden flex items-center">
+            <img src={Logo} alt="logo" className="object-contain" />
           </div>
         </Link>
       </div>
-      <div className="right flex w-auto mr-18 gap-8">
+
+      {/* Right Section: Buttons */}
+      <div className="flex gap-8">
         {!isLoggedIn ? (
-          <div className="right flex w-auto mr-48 gap-8">
+          <>
             <Link to="/login">
-              <div className={navItemsClass} onClick={handleLogin}>
-                Login
-              </div>
+              <div className={navItemsClass}>Login</div>
             </Link>
             <Link to="/register">
-              <div className={navItemsClass} onClick={handleSignUp}>
-                Sign/Up
-              </div>
+              <div className={navItemsClass}>Sign Up</div>
             </Link>
-          </div>
+          </>
         ) : (
-          <div className="right flex w-auto mr-48 gap-8">
-            <div className={navItemsClass} onClick={handleLogin}>
-              Logout
-            </div>
+          <div className={navItemsClass} onClick={handleLogout}>
+            Logout
           </div>
         )}
       </div>

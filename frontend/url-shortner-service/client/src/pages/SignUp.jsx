@@ -13,7 +13,7 @@ const SignUp = () => {
   const [passwordNotMatch, setPasswordMatch] = useState(false);
   const [loading,setLoading]=useState(false);
    const [error,setError]=useState();
-   navigate=useNavigate();
+  const navigate=useNavigate();
   const handleEmailChange = (e) => {
     setFormData({ ...formData, email: e.target.value });
   };
@@ -45,6 +45,7 @@ if (formData.password !== formData.reType) {
    
       console.log("Registered User:", response.data);
       alert("Account created successfully!");
+      navigate("/Dashboard");
       
     } catch (err) {
       // Axios stores backend error messages in err.response.data
