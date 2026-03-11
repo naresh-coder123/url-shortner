@@ -19,7 +19,7 @@ const Dashboard = ({ isLoggedIn }) => {
 
     setLoading(true);
     try {
-      const response = await api.post("/urls/shorten", { longUrl });
+      const response = await api.post("/shorten", { longUrl });
 
       console.log("LongUrl:", longUrl);
 
