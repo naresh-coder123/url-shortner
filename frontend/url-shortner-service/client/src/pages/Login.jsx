@@ -29,7 +29,7 @@ const Login = ({ setIsLoggedIn }) => {
     setError("");
 
     try {
-      const response = await api.post("/users/login", formData);
+      const response = await api.post("/user/login", formData);
       
       // Store token
       localStorage.setItem("accessToken", response.data.data.accessToken);
