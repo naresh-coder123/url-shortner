@@ -8,8 +8,6 @@ const redisClient = createClient();
 await redisClient.connect();
 
 export const shortner = AsyncHandler(async (req, res, next) => {
-  console.log(req.body);
-
   const { longUrl } = req.body;
   const charSet =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

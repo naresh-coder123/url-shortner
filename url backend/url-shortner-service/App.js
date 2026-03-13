@@ -10,10 +10,9 @@ app.use(express.urlencoded({extended:true, limit:'16kb'}));
 app.use(express.static('public'));
 app.use(cookieParser());
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin:'CORS_ORIGIN',
     credentials:true,
 }));
-app.use(cookieParser());
 import UserRouter from './routes/User.route.js';
 import { Url} from './routes/Url.route.js';
 app.use("/api/user",UserRouter);
