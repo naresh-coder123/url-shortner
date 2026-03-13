@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
-const UrlDisplay = ({ urlShort, urlLong, clicks, id }) => {
+const UrlDisplay = ({ urlShort, urlLong, clicks = 0, id }) => {
+  const [isCopied, setCopy] = useState(false);
+
   const handleCopy = async () => {
     try {
+      setCopy(true);
       await navigator.clipboard.writeText(urlShort);
-      alert("Copied to clipboard!");
+      setTimeout(() => {
+        setCopy(false);
+      }, 1000);
     } catch (err) {
       console.error("Copy failed", err);
     }
@@ -27,7 +32,7 @@ const UrlDisplay = ({ urlShort, urlLong, clicks, id }) => {
           onClick={handleCopy}
           className="bg-yellow-100 px-3 py-1 rounded-lg mr-2 transition-duration-300 hover:bg-yellow-900 hover:text-amber-50 hover:cursor-pointer"
         >
-          Copy
+          {isCopied ? <div>Copied 👍</div> : <div>Copy</div>}
         </button>
       </td>
     </tr>
