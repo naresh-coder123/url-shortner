@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../assets/Axios";
+import UrlDisplay from "../components/UrlDisplay";
 const Dashboard = ({ isLoggedIn }) => {
   const navigate = useNavigate();
 
   const [longUrl, setLongUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userUrls, setUserUrls] = useState([]);
+  // Big Array store all the URLs created by user In this Session
 
   const handleShorten = async (e) => {
     // If not logged in, redirect to signup/login immediately
@@ -22,16 +25,25 @@ const Dashboard = ({ isLoggedIn }) => {
       const response = await api.post("/shorten", { longUrl });
 
       console.log("LongUrl:", longUrl);
-
+      console.log(response);
       console.log("Short URL generated:", response.data);
+
+      setUserUrls((prevUser) => {
+        let newUser = {
+          id: response.data.data.id,
+          urlShort: response.data.data.shortUrl,
+          urlLong: response.data.data.longUrl,
+          clicks: response.data.data.clicks,
+        };
+        prevUser = [...prevUser, newUser];
+        return prevUser;
+      });
     } catch (err) {
       alert(err.response?.data?.message || "Failed to shorten URL");
     } finally {
       setLoading(false);
     }
   };
-
-  //   showing the data for the last 7 days
 
   return (
     <main className="font-sans min-h-screen p-8 w-full bg-yellow-200 pt-28">
@@ -62,38 +74,35 @@ const Dashboard = ({ isLoggedIn }) => {
           </button>
         </div>
 
-        <h1 className="text-5xl mt-10 mb-10 font-black text-center text-yellow-950">
-          Your Analytics Dashboard
-        </h1>
+        {userUrls && (
+          <div>
+            <h1 className="text-5xl mt-10 mb-10 font-black text-center text-yellow-950">
+              Your Analytics Dashboard
+            </h1>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-yellow-200 overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-yellow-700 text-white">
-              <tr>
-                <th className="p-4">Original URL</th>
-                <th className="p-4">Short Link</th>
-                <th className="p-4">Clicks</th>
-                <th className="p-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-yellow-950">
-              <tr className="border-b border-yellow-100">
-                <td className="p-4 truncate max-w-xs">
-                  https://very-long-link.com/example...
-                </td>
-                <td className="p-4 font-mono font-bold text-yellow-600">
-                  url.sh/xY2z
-                </td>
-                <td className="p-4">452</td>
-                <td className="p-4">
-                  <button className="bg-yellow-100 px-3 py-1 rounded-lg mr-2">
-                    Copy
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            <div className="bg-white rounded-3xl shadow-sm border border-yellow-200 overflow-hidden">
+              <table className="w-full text-left">
+                <thead className="bg-yellow-700 text-white">
+                  <tr>
+                    <th className="p-4">Original URL</th>
+                    <th className="p-4">Short Link</th>
+                    <th className="p-4">Clicks</th>
+                    <th className="p-4">Actions</th>
+                  </tr>
+                </thead>
+
+                {userUrls.map(({ urlShort, urlLong, clicks }, idx) => (
+                  <UrlDisplay
+                    urlShort={urlShort}
+                    urlLong={urlLong}
+                    key={idx}
+                    clicks={clicks}
+                  />
+                ))}
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
