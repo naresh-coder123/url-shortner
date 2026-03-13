@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { shortner, redirectUrl } from "../controllers/Url.controller.js";
+import { shortner, getUrlAnalytics } from "../controllers/Url.controller.js";
 import { verifyJwt } from "../middlewares/Auth.middleware.js";
 
-export const UrlShortner=Router();
+export const Url=Router();
 
-UrlShortner.route("/").post(verifyJwt, shortner);
+Url.route("/").post(verifyJwt, shortner);
+Url.route("/:id").post(verifyJwt, getUrlAnalytics);
 

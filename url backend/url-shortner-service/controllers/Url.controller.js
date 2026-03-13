@@ -3,6 +3,9 @@ import { Url } from "../models/Url.model.js";
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { createClient } from 'redis';
+const redisClient = createClient();
+await redisClient.connect();
 
 
 export const shortner = AsyncHandler(async (req, res, next) => {
@@ -40,14 +43,63 @@ export const redirectUrl = AsyncHandler(async (req, res, next) => {
     const { shortUrl } = req.params;
     console.log("Incoming shortCode search:", shortUrl); 
 
+   const  cachedUrl=await redisClient.get(`short:${shortUrl}`);
+
+     if (cachedUrl) {
+        console.log("CACHE HIT ⚡");
+        Url.updateOne({ shortUrl }, { $inc: { clicks: 1 } }).exec();
+
+        const userAgent = req.get("User-Agent");
+        const metadata = {
+            device: userAgent.includes("Mobile") ? "Mobile" : "Desktop",
+            browser: userAgent.split(" ")[0], // Simplistic browser detection
+            referrer: req.get("Referrer") || "Direct",
+        };
+
+        Url.updateOne(
+            { shortUrl },
+            { 
+               
+                $push: { analytics: metadata } 
+            }
+        ).exec();
+        return res.redirect(cachedUrl);
+    }
+
     const urlBlock = await Url.findOne({ shortUrl });
     
     if (!urlBlock) {
         console.log("Database lookup failed for:", shortUrl);
         throw new ApiError(404, "Short URL not found");
     }
-
+    
+await redisClient.set(`short:${shortUrl}`, urlBlock.longUrl, { EX: 86400 });
     Url.updateOne({ _id: urlBlock._id }, { $inc: { clicks: 1 } }).exec();
 
+    const userAgent = req.get("User-Agent");
+        const metadata = {
+            device: userAgent.includes("Mobile") ? "Mobile" : "Desktop",
+            browser: userAgent.split(" ")[0], // Simplistic browser detection
+            referrer: req.get("Referrer") || "Direct",
+        };
+
+        Url.updateOne(
+            { shortUrl },
+            { 
+               
+                $push: { analytics: metadata } 
+            }
+        ).exec();
+
     res.redirect(urlBlock.longUrl); 
+});
+
+export const getUrlAnalytics = AsyncHandler(async (req, res) => {
+    const { id } = req.params; // The MongoDB _id of the URL block
+
+    const urlData = await Url.findById(id).select("longUrl shortUrl clicks analytics");
+
+    if (!urlData) throw new ApiError(404, "URL not found");
+
+    res.status(200).json(new ApiResponse(200, urlData, "Analytics retrieved"));
 });
