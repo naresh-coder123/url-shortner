@@ -1,17 +1,24 @@
 import React from "react";
 import Logo from "../assets/logoNew.png";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../assets/Axios";
 
-const Nav = ({ isLoggedIn, setIsLoggedIn,setUser }) => {
+const Nav = ({ isLoggedIn, setIsLoggedIn, setUser }) => {
   const navigate = useNavigate();
 
   const navItemsClass = `font-bold text-2xl text-white p-2 border-4 border-yellow-100 rounded-2xl hover:border-yellow-200 transition-all duration-100 hover:bg-yellow-200 hover:text-black cursor-pointer`;
 
-  const handleLogout = () => {
-    // 1. Clear authentication (example: localStorage.removeItem("token"))
-    setUser(null);
-    setIsLoggedIn(false);
-    navigate("/login"); // Redirect to Login after logout
+  const handleLogout = async () => {
+    try {
+      await api.post("/user/logout");
+
+      setIsLoggedIn(false);
+      setUser(null);
+
+      navigate("/login");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
