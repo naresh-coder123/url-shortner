@@ -1,11 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../assets/Axios";
+import UrlDisplay from "../components/UrlDisplay";
 const Dashboard = ({ isLoggedIn }) => {
   const navigate = useNavigate();
 
   const [longUrl, setLongUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userUrls, setUserUrls] = useState([]);
+
+  useEffect(() => {
+    const fetchUrls = async () => {
+      const res = await api.get("/shorten/urls");
+      setUserUrls(
+        res.data.data.map((url) => ({
+          _id: url._id,
+          urlShort: `http://localhost:8000/${url.shortUrl}`,
+          urlLong: url.longUrl,
+          clicks: url.clicks,
+        })),
+      );
+    };
+
+    // Fetch All the Previous URL's may have been created by User
+    fetchUrls();
+  }, []);
+  // Big Array store all the URLs created by user In this Session
 
   const handleShorten = async (e) => {
     // If not logged in, redirect to signup/login immediately
@@ -22,16 +42,24 @@ const Dashboard = ({ isLoggedIn }) => {
       const response = await api.post("/shorten", { longUrl });
 
       console.log("LongUrl:", longUrl);
-
+      console.log(response);
       console.log("Short URL generated:", response.data);
+
+      setUserUrls((prev) => [
+        ...prev,
+        {
+          _id: response.data.data.id,
+          urlShort: response.data.data.shortUrl,
+          urlLong: response.data.data.longUrl,
+          clicks: response.data.data.clicks,
+        },
+      ]);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to shorten URL");
     } finally {
       setLoading(false);
     }
   };
-
-  //   showing the data for the last 7 days
 
   return (
     <main className="font-sans min-h-screen p-8 w-full bg-yellow-200 pt-28">
@@ -62,38 +90,37 @@ const Dashboard = ({ isLoggedIn }) => {
           </button>
         </div>
 
-        <h1 className="text-5xl mt-10 mb-10 font-black text-center text-yellow-950">
-          Your Analytics Dashboard
-        </h1>
+        {userUrls.length > 0 && (
+          <div>
+            <h1 className="text-5xl mt-10 mb-10 font-black text-center text-yellow-950">
+              Your Analytics Dashboard
+            </h1>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-yellow-200 overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-yellow-700 text-white">
-              <tr>
-                <th className="p-4">Original URL</th>
-                <th className="p-4">Short Link</th>
-                <th className="p-4">Clicks</th>
-                <th className="p-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-yellow-950">
-              <tr className="border-b border-yellow-100">
-                <td className="p-4 truncate max-w-xs">
-                  https://very-long-link.com/example...
-                </td>
-                <td className="p-4 font-mono font-bold text-yellow-600">
-                  url.sh/xY2z
-                </td>
-                <td className="p-4">452</td>
-                <td className="p-4">
-                  <button className="bg-yellow-100 px-3 py-1 rounded-lg mr-2">
-                    Copy
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            <div className="bg-white rounded-3xl shadow-sm border border-yellow-200 overflow-hidden">
+              <table className="w-full text-left">
+                <thead className="bg-yellow-700 text-white">
+                  <tr>
+                    <th className="p-4">Original URL</th>
+                    <th className="p-4">Short Link</th>
+                    <th className="p-4">Clicks</th>
+                    <th className="p-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {userUrls.map(({ urlShort, urlLong, clicks, _id }) => (
+                    <UrlDisplay
+                      urlShort={urlShort}
+                      urlLong={urlLong}
+                      key={_id}
+                      id={_id}
+                      clicks={clicks}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

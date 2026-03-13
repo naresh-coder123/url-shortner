@@ -8,11 +8,11 @@ const app = express();
 app.use(express.json({limit:'16kb'}));
 app.use(express.urlencoded({extended:true, limit:'16kb'}));
 app.use(express.static('public'));
+app.use(cookieParser());
 app.use(cors({
     origin:'CORS_ORIGIN',
     credentials:true,
 }));
-app.use(cookieParser());
 import UserRouter from './routes/User.route.js';
 import { Url} from './routes/Url.route.js';
 app.use("/api/user",UserRouter);

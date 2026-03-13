@@ -3,9 +3,9 @@ import api from "../assets/Axios";
 import Loader from "../assets/Loader.svg";
 import { useNavigate } from "react-router-dom";
 
-const Login = ({ setIsLoggedIn }) => {
+const Login = ({ setIsLoggedIn, setUser }) => {
   const navigate = useNavigate();
-  
+
   // 1. Initialize state
   const [formData, setFormData] = useState({
     email: "",
@@ -22,7 +22,6 @@ const Login = ({ setIsLoggedIn }) => {
     });
   };
 
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -30,13 +29,15 @@ const Login = ({ setIsLoggedIn }) => {
 
     try {
       const response = await api.post("/user/login", formData);
-      
+
       // Store token
       localStorage.setItem("accessToken", response.data.data.accessToken);
-      
+      const res = await api.get("/shorten/me");
+
       // Update global auth state
       setIsLoggedIn(true);
-      
+      setUser(res.data.data);
+
       // Redirect to dashboard
       navigate("/dashboard");
     } catch (err) {
@@ -54,7 +55,10 @@ const Login = ({ setIsLoggedIn }) => {
           Log In to Your Account
         </h1>
 
-        <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-5 w-full max-w-md">
+        <form
+          onSubmit={handleSubmit}
+          className="mt-10 flex flex-col gap-5 w-full max-w-md"
+        >
           {/* Error Message Display */}
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-xl">
@@ -96,7 +100,11 @@ const Login = ({ setIsLoggedIn }) => {
             className="mt-4 flex justify-center items-center hover:text-yellow-950 bg-yellow-600 text-white font-bold py-4 rounded-2xl hover:bg-yellow-400 active:scale-95 transition-all shadow-lg text-lg cursor-pointer disabled:bg-yellow-800"
           >
             {loading ? (
-              <img src={Loader} alt="loading..." className="w-8 h-8 animate-spin" />
+              <img
+                src={Loader}
+                alt="loading..."
+                className="w-8 h-8 animate-spin"
+              />
             ) : (
               "Sign in"
             )}
