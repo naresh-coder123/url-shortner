@@ -113,3 +113,13 @@ export const getUrlAnalytics = AsyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, urlData, "Analytics retrieved"));
 });
+
+export const getUserUrls = AsyncHandler(async (req, res) => {
+
+  const urls = await Url.find({ owner: req.user._id })
+    .select("longUrl shortUrl clicks createdAt");
+
+  res.status(200).json(
+    new ApiResponse(200, urls, "User URLs fetched successfully")
+  );
+});

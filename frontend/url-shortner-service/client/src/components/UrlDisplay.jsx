@@ -1,6 +1,6 @@
 import React from "react";
 
-const UrlDisplay = ({ urlShort, urlLong, clicks }) => {
+const UrlDisplay = ({ urlShort, urlLong, clicks, id }) => {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(urlShort);

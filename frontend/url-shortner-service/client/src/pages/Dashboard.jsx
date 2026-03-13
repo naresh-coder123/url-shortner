@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../assets/Axios";
 import UrlDisplay from "../components/UrlDisplay";
@@ -8,6 +8,23 @@ const Dashboard = ({ isLoggedIn }) => {
   const [longUrl, setLongUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [userUrls, setUserUrls] = useState([]);
+
+  useEffect(() => {
+    const fetchUrls = async () => {
+      const res = await api.get("/shorten/urls");
+      setUserUrls(
+        res.data.data.map((url) => ({
+          _id: url._id,
+          urlShort: `http://localhost:8000/${url.shortUrl}`,
+          urlLong: url.longUrl,
+          clicks: url.clicks,
+        })),
+      );
+    };
+
+    // Fetch All the Previous URL's may have been created by User
+    fetchUrls();
+  }, []);
   // Big Array store all the URLs created by user In this Session
 
   const handleShorten = async (e) => {
@@ -28,16 +45,15 @@ const Dashboard = ({ isLoggedIn }) => {
       console.log(response);
       console.log("Short URL generated:", response.data);
 
-      setUserUrls((prevUser) => {
-        let newUser = {
-          id: response.data.data.id,
+      setUserUrls((prev) => [
+        ...prev,
+        {
+          _id: response.data.data.id,
           urlShort: response.data.data.shortUrl,
           urlLong: response.data.data.longUrl,
           clicks: response.data.data.clicks,
-        };
-        prevUser = [...prevUser, newUser];
-        return prevUser;
-      });
+        },
+      ]);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to shorten URL");
     } finally {
@@ -74,7 +90,7 @@ const Dashboard = ({ isLoggedIn }) => {
           </button>
         </div>
 
-        {userUrls && (
+        {userUrls.length > 0 && (
           <div>
             <h1 className="text-5xl mt-10 mb-10 font-black text-center text-yellow-950">
               Your Analytics Dashboard
@@ -90,15 +106,17 @@ const Dashboard = ({ isLoggedIn }) => {
                     <th className="p-4">Actions</th>
                   </tr>
                 </thead>
-
-                {userUrls.map(({ urlShort, urlLong, clicks }, idx) => (
-                  <UrlDisplay
-                    urlShort={urlShort}
-                    urlLong={urlLong}
-                    key={idx}
-                    clicks={clicks}
-                  />
-                ))}
+                <tbody>
+                  {userUrls.map(({ urlShort, urlLong, clicks, _id }) => (
+                    <UrlDisplay
+                      urlShort={urlShort}
+                      urlLong={urlLong}
+                      key={_id}
+                      id={_id}
+                      clicks={clicks}
+                    />
+                  ))}
+                </tbody>
               </table>
             </div>
           </div>
