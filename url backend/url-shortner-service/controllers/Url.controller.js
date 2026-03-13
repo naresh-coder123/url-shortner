@@ -115,11 +115,17 @@ export const getUrlAnalytics = AsyncHandler(async (req, res) => {
 });
 
 export const getUserUrls = AsyncHandler(async (req, res) => {
-
   const urls = await Url.find({ owner: req.user._id })
-    .select("longUrl shortUrl clicks createdAt");
+    .select("longUrl shortUrl clicks createdAt")
+    .sort({ createdAt: -1 });
 
-  res.status(200).json(
-    new ApiResponse(200, urls, "User URLs fetched successfully")
-  );
+  res
+    .status(200)
+    .json(new ApiResponse(200, urls, "User URLs fetched successfully"));
+});
+
+export const getCurrentUser = AsyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
