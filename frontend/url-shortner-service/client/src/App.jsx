@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import api from "./assets/Axios";
+import Analytics from "./pages/Analytics";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,6 +67,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/analytics/:id" element={<Analytics />} />
         </Routes>
       </div>
     </BrowserRouter>

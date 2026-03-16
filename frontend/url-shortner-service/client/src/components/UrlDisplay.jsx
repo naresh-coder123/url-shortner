@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const UrlDisplay = ({ urlShort, urlLong, clicks = 0, id }) => {
+const UrlDisplay = ({ urlShort, urlLong, clicks = 0, id ,onRowClick}) => {
   const [isCopied, setCopy] = useState(false);
 
   const handleCopy = async () => {
@@ -16,7 +16,10 @@ const UrlDisplay = ({ urlShort, urlLong, clicks = 0, id }) => {
   };
 
   return (
-    <tr className="border-b border-yellow-100">
+    <tr
+      onClick={onRowClick}
+      className="cursor-pointer hover:bg-yellow-50 transition-colors"  // ✅ visual feedback
+    >
       <td className="p-4 truncate max-w-xs">{urlLong}</td>
 
       <td className="p-4 font-mono font-bold text-yellow-600">

@@ -114,6 +114,7 @@ const Dashboard = ({ isLoggedIn }) => {
                       key={_id}
                       id={_id}
                       clicks={clicks}
+                      // onRowClick={() => navigate(`/analytics/${_id}`)}
                     />
                   ))}
                 </tbody>
