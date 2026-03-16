@@ -10,7 +10,8 @@ app.use(express.urlencoded({extended:true, limit:'16kb'}));
 app.use(express.static('public'));
 app.use(cookieParser());
 app.use(cors({
-    origin:'CORS_ORIGIN',
+    origin: "https://url-shortner-zg81.vercel.app",
+   
     credentials:true,
 }));
 import UserRouter from './routes/User.route.js';
