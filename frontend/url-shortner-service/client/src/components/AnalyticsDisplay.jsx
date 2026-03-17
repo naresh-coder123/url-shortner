@@ -101,12 +101,12 @@ export default function AnalyticsDisplay({ data = {} }) {
         )}
         {shortUrl && (
           <a
-            href={`http://localhost:8000/${shortUrl}`}
+            href={`https://url-shortner-zg8l.vercel.app/${shortUrl}`}
             target="_blank"
             rel="noreferrer"
             className="inline-block bg-yellow-100 text-yellow-800 font-mono text-sm px-3 py-1 rounded-lg hover:bg-yellow-200 transition-colors"
           >
-            localhost:8000/{shortUrl}
+            https://url-shortner-zg8l.vercel.app/`${shortUrl}`
           </a>
         )}
       </div>
