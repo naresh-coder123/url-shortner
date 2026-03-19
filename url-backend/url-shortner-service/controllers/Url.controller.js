@@ -1,16 +1,35 @@
+import { Redis } from "@upstash/redis"; // Updated Import
 import { Url } from "../models/Url.model.js";
-
 import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { createClient } from "redis";
-const redisClient = createClient();
-await redisClient.connect();
 
-export const shortner = AsyncHandler(async (req, res, next) => {
+const redisClient = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+const updateAnalytics = async (shortUrl, req) => {
+  const userAgent = req.get("User-Agent") || "";
+  const metadata = {
+    device: userAgent.includes("Mobile") ? "Mobile" : "Desktop",
+    browser: userAgent.split(" ")[0] || "Unknown",
+    referrer: req.get("Referrer") || "Direct",
+    timestamp: new Date()
+  };
+
+  return Url.updateOne(
+    { shortUrl },
+    { 
+      $inc: { clicks: 1 },
+      $push: { analytics: metadata } 
+    }
+  ).exec();
+};
+
+export const shortner = AsyncHandler(async (req, res) => {
   const { longUrl } = req.body;
-  const charSet =
-    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const charSet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   const urlBlock = await Url.create({
     longUrl,
@@ -21,6 +40,7 @@ export const shortner = AsyncHandler(async (req, res, next) => {
   let num = urlBlock.universalId;
   let short = "";
 
+  // Base62 Encoding
   if (num === 0) {
     short = charSet[0];
   } else {
@@ -32,70 +52,44 @@ export const shortner = AsyncHandler(async (req, res, next) => {
 
   urlBlock.shortUrl = short;
   await urlBlock.save();
+  const baseUrl =`http://localhost:${process.env.PORT}`;
 
   res.status(200).json(
     new ApiResponse(
       200,
       {
         id: urlBlock._id,
-        shortUrl: `http://localhost:${process.env.PORT}/${short}`,
+        shortUrl: `${baseUrl}/${short}`, 
         longUrl: urlBlock.longUrl,
-        clicks: urlBlock.clicks || 0,
+        clicks: 0,
       },
       "short url created",
     ),
   );
 });
 
-export const redirectUrl = AsyncHandler(async (req, res, next) => {
+export const redirectUrl = AsyncHandler(async (req, res) => {
   const { shortUrl } = req.params;
-  console.log("Incoming shortCode search:", shortUrl);
 
   const cachedUrl = await redisClient.get(`short:${shortUrl}`);
 
   if (cachedUrl) {
     console.log("CACHE HIT ⚡");
-    Url.updateOne({ shortUrl }, { $inc: { clicks: 1 } }).exec();
-
-    const userAgent = req.get("User-Agent");
-    const metadata = {
-      device: userAgent.includes("Mobile") ? "Mobile" : "Desktop",
-      browser: userAgent.split(" ")[0], // Simplistic browser detection
-      referrer: req.get("Referrer") || "Direct",
-    };
-
-    Url.updateOne(
-      { shortUrl },
-      {
-        $push: { analytics: metadata },
-      },
-    ).exec();
+    updateAnalytics(shortUrl, req);
     return res.redirect(cachedUrl);
   }
 
   const urlBlock = await Url.findOne({ shortUrl });
 
   if (!urlBlock) {
-    console.log("Database lookup failed for:", shortUrl);
     throw new ApiError(404, "Short URL not found");
   }
 
-  await redisClient.set(`short:${shortUrl}`, urlBlock.longUrl, { EX: 86400 });
-  Url.updateOne({ _id: urlBlock._id }, { $inc: { clicks: 1 } }).exec();
-
-  const userAgent = req.get("User-Agent");
-  const metadata = {
-    device: userAgent.includes("Mobile") ? "Mobile" : "Desktop",
-    browser: userAgent.split(" ")[0], // Simplistic browser detection
-    referrer: req.get("Referrer") || "Direct",
-  };
-
-  Url.updateOne(
-    { shortUrl },
-    {
-      $push: { analytics: metadata },
-    },
-  ).exec();
+  // 3. Set Upstash Cache (Expires in 24h)
+  await redisClient.set(`short:${shortUrl}`, urlBlock.longUrl, { ex: 86400 });
+  
+  // 4. Update Analytics
+  await updateAnalytics(shortUrl, req);
 
   res.redirect(urlBlock.longUrl);
 });

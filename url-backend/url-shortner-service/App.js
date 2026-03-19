@@ -9,10 +9,15 @@ app.use(express.json({limit:'16kb'}));
 app.use(express.urlencoded({extended:true, limit:'16kb'}));
 app.use(express.static('public'));
 app.use(cookieParser());
+
+const allowedOrigins = [
+  "https://url-shortner-zg81.vercel.app",
+  /\.vercel\.app$/  // This allows ALL preview/branch links from Vercel
+];
 app.use(cors({
-    origin: "https://url-shortner-zg81.vercel.app",
-   
-    credentials:true,
+    origin: allowedOrigins, 
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 }));
 import UserRouter from './routes/User.route.js';
 import { Url} from './routes/Url.route.js';
