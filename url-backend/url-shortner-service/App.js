@@ -18,7 +18,7 @@ app.use(cors({
     origin: allowedOrigins, 
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}));
+})); 
 import UserRouter from './routes/User.route.js';
 import { Url} from './routes/Url.route.js';
 app.use("/api/user",UserRouter);
