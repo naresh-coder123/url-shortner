@@ -8,7 +8,7 @@ const Analytics = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    api.get(`/shorten/analytics/${id}`).then((res) => setData(res.data.data));
+    api.get(`/analytics/yourUrl/${id}`).then((res) => setData(res.data.data));
   }, [id]);
 
   if (!data) return <p>Loading...</p>;
