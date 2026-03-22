@@ -47,7 +47,7 @@ const Landing = ({ isLoggedIn }) => {
         </div>
 
         <p className="mt-6 text-sm text-yellow-800 font-bold font-sans ">
-          Long URLs are ugly. We fix that.
+          Long URLs are ugly. We fix that. :)
         </p>
       </div>
     </main>
