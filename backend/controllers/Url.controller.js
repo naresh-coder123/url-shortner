@@ -92,7 +92,7 @@ export const redirectUrl = AsyncHandler(async (req, res) => {
 
   if (cachedUrl) {
     console.log("CACHE HIT ⚡");
-    updateAnalytics(shortUrl, req);
+    await updateAnalytics(shortUrl, req);
     return res.redirect(cachedUrl);
   }
 

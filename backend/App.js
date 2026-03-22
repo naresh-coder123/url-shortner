@@ -23,6 +23,6 @@ import UserRouter from './routes/User.route.js';
 import { Url} from './routes/Url.route.js';
 app.use("/api/user",UserRouter);
 app.use("/api/shorten",Url);
-app.use("/api/analytics/yourUrl",Url);
+app.use("/api/analytics",Url);
 app.get("/:shortUrl", redirectUrl);
 export default app;
