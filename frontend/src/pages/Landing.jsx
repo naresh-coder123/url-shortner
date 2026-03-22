@@ -18,7 +18,7 @@ const Landing = ({ isLoggedIn }) => {
         </p>
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-          <div className="p-4 bg-amber-50 rounded-2xl border-2 border-teal-900">
+          <div className="p-4 bg-amber-50 rounded-2xl">
             <h3 className="font-bold text-yellow-950 bg-amber-100 rounded-2xl p-3">
               ⚡ Instant Shortening
             </h3>
@@ -27,7 +27,7 @@ const Landing = ({ isLoggedIn }) => {
             </p>
           </div>
 
-          <div className="p-4 bg-amber-50 rounded-2xl border-2 border-teal-900">
+          <div className="p-4 bg-amber-50 rounded-2xl">
             <h3 className="font-bold text-yellow-900 bg-amber-100 rounded-2xl p-3">
               📊 Analytics
             </h3>
@@ -36,7 +36,7 @@ const Landing = ({ isLoggedIn }) => {
             </p>
           </div>
 
-          <div className="p-4 bg-amber-50 rounded-2xl border-2 border-teal-900">
+          <div className="p-4 bg-amber-50 rounded-2xl">
             <h3 className="font-bold text-yellow-900 bg-amber-100 rounded-2xl p-3">
               🔒 Secure
             </h3>
