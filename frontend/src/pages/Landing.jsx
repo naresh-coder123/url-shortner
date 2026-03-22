@@ -1,11 +1,4 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../assets/Axios";
-
-const Landing = ({ isLoggedIn }) => {
-  const [longUrl, setLongUrl] = useState("");
-  const [loading, setLoading] = useState(false);
-
+const Landing = () => {
   return (
     <main className="font-sans min-h-screen p-6 w-full flex justify-center items-center bg-yellow-200">
       <div className="flex flex-col items-center text-center max-w-4xl">
@@ -18,7 +11,7 @@ const Landing = ({ isLoggedIn }) => {
         </p>
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-          <div className="p-4 bg-amber-50 rounded-2xl">
+          <div className="p-4 bg-amber-50 rounded-2xl card-lift">
             <h3 className="font-bold text-yellow-950 bg-amber-100 rounded-2xl p-3">
               ⚡ Instant Shortening
             </h3>
@@ -27,7 +20,7 @@ const Landing = ({ isLoggedIn }) => {
             </p>
           </div>
 
-          <div className="p-4 bg-amber-50 rounded-2xl">
+          <div className="p-4 bg-amber-50 rounded-2xl card-lift">
             <h3 className="font-bold text-yellow-900 bg-amber-100 rounded-2xl p-3">
               📊 Analytics
             </h3>
@@ -36,7 +29,7 @@ const Landing = ({ isLoggedIn }) => {
             </p>
           </div>
 
-          <div className="p-4 bg-amber-50 rounded-2xl">
+          <div className="p-4 bg-amber-50 rounded-2xl card-lift">
             <h3 className="font-bold text-yellow-900 bg-amber-100 rounded-2xl p-3">
               🔒 Secure
             </h3>
