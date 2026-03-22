@@ -3,36 +3,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../assets/Axios";
 
 const Landing = ({ isLoggedIn }) => {
-  
   const [longUrl, setLongUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const handleShorten = async (e) => {
-    // If not logged in, redirect to signup/login immediately
-    if (!isLoggedIn) {
-      alert("Please login first to shorten links!");
-      navigate("/login");
-      return;
-    }
-
-    if (!longUrl) return alert("Please paste a URL");
-
-    setLoading(true);
-    try {
-      const response = await api.post("/urls/shorten", { longUrl });
-      
-      console.log("Short URL generated:", response.data);
-      
-  
-      navigate("/dashboard", { state: { newUrl: response.data.data } });
-      
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to shorten URL");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <main className="font-sans min-h-screen p-6 w-full flex justify-center items-center bg-yellow-200">
@@ -45,26 +17,37 @@ const Landing = ({ isLoggedIn }) => {
           Make your links count. Shorten, share, and track performance.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row gap-4 w-full max-w-lg">
-          <input
-            type="url"
-            value={longUrl}
-            onChange={(e) => setLongUrl(e.target.value)}
-            placeholder="Paste your long link here..."
-            className="flex-1 px-6 py-4 rounded-2xl border-2 border-yellow-300 focus:outline-none focus:border-yellow-600 bg-white shadow-sm"
-          />
-          
-          <button 
-            onClick={handleShorten}
-            disabled={loading}
-            className="bg-yellow-600 cursor-pointer text-xl text-white font-bold px-8 py-4 rounded-2xl hover:bg-yellow-400 hover:text-yellow-950 transition-colors shadow-lg active:scale-95 disabled:opacity-50"
-          >
-            {loading ? "..." : "Shorten"}
-          </button>
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+          <div className="p-4 bg-indigo-100 rounded-2xl border-2 border-teal-900">
+            <h3 className="font-bold text-yellow-950 bg-amber-50 rounded-2xl p-3">
+              ⚡ Instant Shortening
+            </h3>
+            <p className="text-sm text-yellow-800/70 p-4">
+              Create short links in milliseconds with zero hassle.
+            </p>
+          </div>
+
+          <div className="p-4 bg-indigo-100 rounded-2xl border-2 border-teal-900">
+            <h3 className="font-bold text-yellow-900 bg-amber-50 rounded-2xl p-3">
+              📊 Analytics
+            </h3>
+            <p className="text-sm text-yellow-800/70 p-4">
+              Track clicks, devices, and usage patterns easily.
+            </p>
+          </div>
+
+          <div className="p-4 bg-indigo-100 rounded-2xl border-2 border-teal-900">
+            <h3 className="font-bold text-yellow-900 bg-amber-50 rounded-2xl p-3">
+              🔒 Secure
+            </h3>
+            <p className="text-sm text-yellow-800/70 p-4">
+              Your data stays protected with modern security practices.
+            </p>
+          </div>
         </div>
-        
-        <p className="mt-6 text-sm text-yellow-800 font-medium">
-          Join 10,000+ users shortening links daily.
+
+        <p className="mt-6 text-sm text-yellow-800 font-bold font-sans ">
+          Long URLs are ugly. We fix that.
         </p>
       </div>
     </main>
