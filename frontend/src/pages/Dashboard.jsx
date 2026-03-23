@@ -28,39 +28,39 @@ const Dashboard = ({ isLoggedIn }) => {
   // Big Array store all the URLs created by user In this Session
 
   const handleShorten = async (e) => {
-    // If not logged in, redirect to signup/login immediately
-    if (!isLoggedIn) {
-      alert("Please login first to shorten links!");
-      navigate("/login");
-      return;
-    }
+  if (!isLoggedIn) {
+    alert("Please login first to shorten links!");
+    navigate("/login");
+    return;
+  }
 
-    if (!longUrl) return alert("Please paste a URL");
+  if (!longUrl) return alert("Please paste a URL");
 
-    setLoading(true);
-    try {
-      const response = await api.post("/shorten", { longUrl });
+  setLoading(true);
+  try {
+    const response = await api.post("/shorten", { longUrl });
+    const newUrlData = response.data.data;
 
-      console.log("LongUrl:", longUrl);
-      console.log(response);
-      console.log("Short URL generated:", response.data);
+    // Create the new object to match your table's structure
+    const newUrlEntry = {
+      _id: newUrlData._id || newUrlData.id, // Handle potential key difference
+      urlShort: `http://localhost:8000/${newUrlData.shortUrl}`, // Add prefix here too!
+      urlLong: newUrlData.longUrl,
+      clicks: newUrlData.clicks || 0,
+    };
 
-      setUserUrls((prev) => [
-        ...prev,
-        {
-          _id: response.data.data.id,
-          urlShort: response.data.data.shortUrl,
-          urlLong: response.data.data.longUrl,
-          clicks: response.data.data.clicks,
-        },
-      ]);
-    } catch (err) {
-      alert(err.response?.data?.message || "Failed to shorten URL");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setUserUrls((prev) => [newUrlEntry, ...prev]);
 
+    // Clear the input field for a better user experience
+    setLongUrl("");
+    
+    console.log("UI Updated Instantly!");
+  } catch (err) {
+    alert(err.response?.data?.message || "Failed to shorten URL");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <main className="font-sans min-h-screen p-8 w-full bg-yellow-200 pt-28">
       <div className="max-w-6xl mx-auto flex flex-col gap-4 items-center ">
