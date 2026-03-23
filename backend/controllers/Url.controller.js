@@ -68,7 +68,7 @@ export const shortner = AsyncHandler(async (req, res) => {
 
   urlBlock.shortUrl = short;
   await urlBlock.save();
-  const baseUrl = `http://localhost:${process.env.PORT}`;
+  const baseUrl = process.env.BASE_URL;
 
   res.status(200).json(
     new ApiResponse(
