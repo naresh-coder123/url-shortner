@@ -10,12 +10,12 @@ app.use(express.urlencoded({extended:true, limit:'16kb'}));
 app.use(express.static('public'));
 app.use(cookieParser());
 
-const allowedOrigins = [
-  "https://url-shortner-zg81.vercel.app",
-  /\.vercel\.app$/  // This allows ALL preview/branch links from Vercel
-];
+// const allowedOrigins = [
+//   "https://url-shortner-zg81.vercel.app",
+//   /\.vercel\.app$/  // This allows ALL preview/branch links from Vercel
+// ];
 app.use(cors({
-    origin: allowedOrigins, 
+    origin: 'http://localhost:5173', // wirte here origin :allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
 })); 

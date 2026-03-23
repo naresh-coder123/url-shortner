@@ -10,7 +10,7 @@ import { verifyJwt } from "../middlewares/Auth.middleware.js";
 export const Url = Router();
 
 Url.route("/").post(verifyJwt, shortner);
-Url.route("/:id").post(verifyJwt, getUrlAnalytics);
+Url.get("/me", verifyJwt, getCurrentUser);
 Url.get("/urls", verifyJwt, getUserUrls);
 
-Url.get("/me", verifyJwt, getCurrentUser);
+Url.route("/:id").get(verifyJwt, getUrlAnalytics);

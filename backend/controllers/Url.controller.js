@@ -4,32 +4,48 @@ import { AsyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-const redisClient = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+// const redisClient = new Redis({
+//   url: process.env.UPSTASH_REDIS_REST_URL,
+//   token: process.env.UPSTASH_REDIS_REST_TOKEN,
+//   enableAutoPipelining: false,
+// });
+/*  */
+let redisClient;
 
+const getRedis = () => {
+  if (!redisClient) {
+    console.log("Initializing Redis with:", process.env.UPSTASH_REDIS_REST_URL);
+
+    redisClient = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+  }
+  return redisClient;
+};
+/*  */
 const updateAnalytics = async (shortUrl, req) => {
   const userAgent = req.get("User-Agent") || "";
   const metadata = {
     device: userAgent.includes("Mobile") ? "Mobile" : "Desktop",
     browser: userAgent.split(" ")[0] || "Unknown",
     referrer: req.get("Referrer") || "Direct",
-    timestamp: new Date()
+    timestamp: new Date(),
   };
 
   return Url.updateOne(
     { shortUrl },
-    { 
+    {
       $inc: { clicks: 1 },
-      $push: { analytics: metadata } 
-    }
+      $push: { analytics: metadata },
+    },
   ).exec();
 };
 
 export const shortner = AsyncHandler(async (req, res) => {
   const { longUrl } = req.body;
-  const charSet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const charSet =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   const urlBlock = await Url.create({
     longUrl,
@@ -52,14 +68,14 @@ export const shortner = AsyncHandler(async (req, res) => {
 
   urlBlock.shortUrl = short;
   await urlBlock.save();
-  const baseUrl =`http://localhost:${process.env.PORT}`;
+  const baseUrl = `http://localhost:${process.env.PORT}`;
 
   res.status(200).json(
     new ApiResponse(
       200,
       {
         id: urlBlock._id,
-        shortUrl: `${baseUrl}/${short}`, 
+        shortUrl: `${baseUrl}/${short}`,
         longUrl: urlBlock.longUrl,
         clicks: 0,
       },
@@ -71,11 +87,12 @@ export const shortner = AsyncHandler(async (req, res) => {
 export const redirectUrl = AsyncHandler(async (req, res) => {
   const { shortUrl } = req.params;
 
-  const cachedUrl = await redisClient.get(`short:${shortUrl}`);
+  const redis = getRedis();
+  const cachedUrl = await redis.get(`short:${shortUrl}`);
 
   if (cachedUrl) {
     console.log("CACHE HIT ⚡");
-    updateAnalytics(shortUrl, req);
+    await updateAnalytics(shortUrl, req);
     return res.redirect(cachedUrl);
   }
 
@@ -86,8 +103,8 @@ export const redirectUrl = AsyncHandler(async (req, res) => {
   }
 
   // 3. Set Upstash Cache (Expires in 24h)
-  await redisClient.set(`short:${shortUrl}`, urlBlock.longUrl, { ex: 86400 });
-  
+  await redis.set(`short:${shortUrl}`, urlBlock.longUrl, { ex: 86400 });
+
   // 4. Update Analytics
   await updateAnalytics(shortUrl, req);
 

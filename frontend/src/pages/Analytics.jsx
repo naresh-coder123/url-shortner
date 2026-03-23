@@ -8,8 +8,7 @@ const Analytics = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    api.get(`/shorten/analytics/${id}`)
-      .then(res => setData(res.data.data));
+    api.get(`/analytics/${id}`).then((res) => setData(res.data.data));
   }, [id]);
 
   if (!data) return <p>Loading...</p>;
@@ -17,10 +16,7 @@ const Analytics = () => {
   return (
     <main className="min-h-screen p-8 bg-yellow-200 pt-28">
       <div className="max-w-4xl mx-auto">
-        <AnalyticsDisplay
-          analytics={data.analytics}
-          shortUrl={`http://localhost:8000/${data.shortUrl}`}
-        />
+        <AnalyticsDisplay data={data} />
       </div>
     </main>
   );
