@@ -103,7 +103,8 @@ if(!user)throw new ApiError(401 ,"user does not exist");
    
    const options=[{
     httpOnly:true,
-    // secure:true
+    secure:true,
+    sameSite: "none", 
    }
    ]
 
