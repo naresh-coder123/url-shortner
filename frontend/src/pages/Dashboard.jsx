@@ -15,7 +15,7 @@ const Dashboard = ({ isLoggedIn }) => {
       setUserUrls(
         res.data.data.map((url) => ({
           _id: url._id,
-          urlShort: `http://localhost:8000/${url.shortUrl}`,
+          urlShort: `https://your-backend.onrender.com/${url.shortUrl}`,
           urlLong: url.longUrl,
           clicks: url.clicks,
         })),
