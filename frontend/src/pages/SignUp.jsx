@@ -4,6 +4,7 @@ import api from "../assets/Axios";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 const SignUp = () => {
+  console.log("API URL:", import.meta.env.VITE_API_URL);
   const [formData, setFormData] = useState({
     fullName:"",
     email: "",
