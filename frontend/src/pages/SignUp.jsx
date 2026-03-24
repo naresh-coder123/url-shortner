@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import Loader from "../assets/Loader.svg"
+import Loader from "../assets/Loader.svg";
 import api from "../assets/Axios";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    fullName:"",
+    fullName: "",
     email: "",
     password: "",
     reType: "",
   });
   const [passwordNotMatch, setPasswordMatch] = useState(false);
-  const [loading,setLoading]=useState(false);
-   const [error,setError]=useState();
-  const navigate=useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
+  const navigate = useNavigate();
   const handleEmailChange = (e) => {
     setFormData({ ...formData, email: e.target.value });
   };
@@ -25,28 +25,26 @@ const SignUp = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-if (formData.password !== formData.reType) {
+    if (formData.password !== formData.reType) {
       alert("The passwords do not match");
       return;
     }
+    console.log("API URL:", import.meta.env.VITE_API_URL);
 
     setLoading(true);
 
     try {
-     
       const response = await api.post("/user/register", {
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password,
       });
 
-   
       console.log("Registered User:", response.data);
       alert("Account created successfully!");
       navigate("/Dashboard");
-      
     } catch (err) {
       // Axios stores backend error messages in err.response.data
       const message = err.response?.data?.message || "Something went wrong";
@@ -64,10 +62,8 @@ if (formData.password !== formData.reType) {
         </h1>
 
         <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-5">
-           <div className="flex flex-col gap-2">
-            <label className="text-yellow-950 font-bold ml-1">
-              fullname
-            </label>
+          <div className="flex flex-col gap-2">
+            <label className="text-yellow-950 font-bold ml-1">fullname</label>
             <input
               type="fullName"
               name="fullName"
@@ -127,9 +123,12 @@ if (formData.password !== formData.reType) {
             type="submit"
             className="mt-4 hover:text-yellow-950 bg-yellow-600 text-white font-bold py-4 rounded-2xl hover:bg-yellow-400 active:scale-95 transition-all shadow-lg text-lg cursor-pointer"
           >
-
-           {loading ? (
-              <img src={Loader} alt="loading..." className="w-8 h-8 animate-spin" />
+            {loading ? (
+              <img
+                src={Loader}
+                alt="loading..."
+                className="w-8 h-8 animate-spin"
+              />
             ) : (
               "Register"
             )}
