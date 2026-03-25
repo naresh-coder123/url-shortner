@@ -16,7 +16,7 @@ app.use(cookieParser());
 // ];
 app.use(
   cors({
-    origin: "https://url-shortner-1.vercel.app", // wirte here origin :allowedOrigins,
+    origin: "https://url-shortner-m2ef.vercel.app", // wirte here origin :allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   }),
