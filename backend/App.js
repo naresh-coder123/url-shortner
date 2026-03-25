@@ -25,6 +25,10 @@ app.use(
 
 import UserRouter from "./routes/User.route.js";
 import { Url } from "./routes/Url.route.js";
+app.use("/api/hello", (req, res) => {
+    console.log("hello world");
+    res.status(200).json({ message: "hello world" }); // Send a response!
+});
 app.use("/api/user", UserRouter);
 app.use("/api/shorten", Url);
 app.use("/api/analytics", Url);
