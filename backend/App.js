@@ -25,9 +25,12 @@ app.use(
 
 import UserRouter from "./routes/User.route.js";
 import { Url } from "./routes/Url.route.js";
-app.post("/api/hello", (req, res) => {
-    console.log("hello world");
-    res.status(200).json({ message: "hello world" }); // Send a response!
+app.get("/", (req, res) => {
+    res.status(200).json({
+        message: "URL Shortener API is live!",
+        status: "healthy",
+        uptime: process.uptime()
+    });
 });
 app.use("/api/user", UserRouter);
 app.use("/api/shorten", Url);
