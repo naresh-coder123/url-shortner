@@ -1,30 +1,43 @@
-import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
 
 import mongoose from "mongoose";
 import app from "./App.js";
 
-(async () => {
-  try {
-    const connectionInstance = await mongoose.connect(
-      `${process.env.MONGODB_URI}/${process.env.DB_name}`,
-    );
-    console.log(
-      `\n MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`,
-    );
+// 1. Establish the Connection Logic
+const connectDB = async () => {
+    try {
+        if (mongoose.connection.readyState >= 1) return; // Use existing connection
 
-    const PORT = process.env.PORT || 8000;
+        const connectionInstance = await mongoose.connect(
+            `${process.env.MONGODB_URI}/${process.env.DB_name}`
+        );
+        console.log(`\n MongoDB connected !! DB HOST: ${connectionInstance.connection.host}`);
+    } catch (error) {
+        console.log("MONGODB connection FAILED ", error);
+        // On serverless, we don't always want to kill the process immediately,
+        // but for a URL shortener, we can't function without it.
+        throw error; 
+    }
+};
 
-    app.listen(PORT, () => {
-      console.log(`⚙️ Server is running at port : ${PORT}`);
-    });
+// 2. Local Development Execution
+// Vercel ignores this block; it only runs when you type 'npm run dev' locally
+if (process.env.NODE_ENV !== 'production') {
+    connectDB()
+        .then(() => {
+            app.listen(process.env.PORT || 8000, () => {
+                console.log(`⚙️ Server is running at port : ${process.env.PORT || 8000}`);
+            });
+        })
+        .catch((err) => {
+            console.log("Initialization Failed", err);
+        });
+}
 
-    app.on("error", (error) => {
-      console.log("ERRR: ", error);
-      throw error;
-    });
-  } catch (error) {
-    console.log("MONGODB connection FAILED ", error);
-    process.exit(1); // Stop the process if DB fails
-  }
-})();
+// 3. Export for Vercel
+// This allows Vercel to treat 'app' as the entry point for Serverless Functions
+export default async (req, res) => {
+    await connectDB();
+    return app(req, res);
+};
